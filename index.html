@@ -3,7 +3,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Dosya Yolla (Uguu)</title>
+  <title>Dosya Yolla (Transfer.sh)</title>
   <style>
     body {
       font-family: Arial;
@@ -40,14 +40,14 @@
 </head>
 <body>
   <div class="box">
-    <h2>📤 Dosya Yolla (Uguu.se)</h2>
+    <h2>📤 Dosya Yolla (Transfer.sh)</h2>
     <input type="file" id="fileInput"><br>
-    <button onclick="uploadToUguu()">Yükle</button>
+    <button onclick="uploadToTransfer()">Yükle</button>
     <div id="result"></div>
   </div>
 
   <script>
-    async function uploadToUguu() {
+    async function uploadToTransfer() {
       const fileInput = document.getElementById('fileInput');
       const file = fileInput.files[0];
       if (!file) {
@@ -61,20 +61,16 @@
       formData.append("file", file);
 
       try {
-        const response = await fetch("https://uguu.se/upload.php", {
+        const response = await fetch("https://transfer.sh/" + file.name, {
           method: "POST",
-          body: formData
+          body: file
         });
-        const result = await response.json();
-        if (result.success) {
-          const link = result.url;
-          document.getElementById("result").innerHTML = `
-            ✅ Yükleme tamamlandı!<br>
-            <a href="${link}" target="_blank">${link}</a>
-          `;
-        } else {
-          document.getElementById("result").innerHTML = "❌ Hata: " + result.error;
-        }
+
+        const link = await response.text();
+        document.getElementById("result").innerHTML = `
+          ✅ Yükleme tamamlandı!<br>
+          <a href="${link}" target="_blank">${link}</a>
+        `;
       } catch (e) {
         document.getElementById("result").innerHTML = "❌ Yükleme sırasında hata oluştu.";
       }
