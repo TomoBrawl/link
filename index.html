@@ -3,7 +3,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Dosya Yolla (Transfer.sh)</title>
+  <title>Dosya Yolla (Anonfiles)</title>
   <style>
     body {
       font-family: Arial;
@@ -25,7 +25,7 @@
     button {
       padding: 10px 20px;
       border: none;
-      background-color: #28a745;
+      background-color: #007BFF;
       color: white;
       border-radius: 8px;
       cursor: pointer;
@@ -40,14 +40,14 @@
 </head>
 <body>
   <div class="box">
-    <h2>📤 Dosya Yolla (Transfer.sh)</h2>
+    <h2>📤 Dosya Yolla (Anonfiles)</h2>
     <input type="file" id="fileInput"><br>
-    <button onclick="uploadToTransfer()">Yükle</button>
+    <button onclick="uploadToAnonfiles()">Yükle</button>
     <div id="result"></div>
   </div>
 
   <script>
-    async function uploadToTransfer() {
+    async function uploadToAnonfiles() {
       const fileInput = document.getElementById('fileInput');
       const file = fileInput.files[0];
       if (!file) {
@@ -61,16 +61,21 @@
       formData.append("file", file);
 
       try {
-        const response = await fetch("https://transfer.sh/" + file.name, {
+        const response = await fetch("https://api.anonfiles.com/upload", {
           method: "POST",
-          body: file
+          body: formData
         });
 
-        const link = await response.text();
-        document.getElementById("result").innerHTML = `
-          ✅ Yükleme tamamlandı!<br>
-          <a href="${link}" target="_blank">${link}</a>
-        `;
+        const result = await response.json();
+        if (result.status) {
+          const link = result.data.file.url.full;
+          document.getElementById("result").innerHTML = `
+            ✅ Yükleme tamamlandı!<br>
+            <a href="${link}" target="_blank">${link}</a>
+          `;
+        } else {
+          document.getElementById("result").innerHTML = "❌ Yükleme başarısız: " + result.error.message;
+        }
       } catch (e) {
         document.getElementById("result").innerHTML = "❌ Yükleme sırasında hata oluştu.";
       }
